@@ -1,0 +1,89 @@
+/* Modal Overlay Styling Fix */
+:host {
+    --slds-c-modal-container-width: 90vw;
+    --slds-c-modal-container-max-width: 1200px;
+}
+
+/* Ensure proper modal backdrop */
+.slds-modal__container {
+    background-color: #fff;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16);
+}
+
+/* Remove any unwanted white backgrounds */
+lightning-modal-body {
+    background-color: transparent;
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background-color: #f0f;
+    animation: confetti-fall 3s linear;
+    z-index: 10000;
+}
+
+.confetti:nth-child(odd) {
+    width: 8px;
+    height: 8px;
+    animation-duration: 2.5s;
+}
+
+.confetti:nth-child(3n) {
+    width: 12px;
+    height: 12px;
+    animation-duration: 3.5s;
+}
+
+.success-message {
+    text-align: center;
+    padding: 2rem;
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.success-icon {
+    font-size: 4rem;
+    color: #04844b;
+    margin-bottom: 1rem;
+}
+
+.slds-dropdown {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.slds-listbox__option:hover {
+    background-color: #f3f2f2;
+    cursor: pointer;
+}
+
+.slds-listbox__option-meta {
+    display: block;
+    margin-top: 0.25rem;
+    color: #706e6b;
+    font-size: 0.75rem;
+}

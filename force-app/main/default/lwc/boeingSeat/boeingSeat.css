@@ -1,0 +1,116 @@
+/* Individual Seats */
+.seat {
+    width: 32px;
+    height: 36px;
+    border-radius: 6px 6px 3px 3px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Business Class Seats */
+.business .seat {
+    width: 50px;
+    height: 55px;
+    background: linear-gradient(to bottom, #2c3e50, #34495e);
+    border-radius: 8px 8px 4px 4px;
+}
+
+.business .seat[data-available="true"] {
+    background: linear-gradient(to bottom, #3498db, #2980b9);
+}
+
+.business .seat[data-selected="true"] {
+    background: linear-gradient(to bottom, #e74c3c, #c0392b);
+    transform: scale(1.1);
+}
+
+/* Economy Plus Seats */
+.economy-plus .seat {
+    background: linear-gradient(to bottom, #7f8c8d, #95a5a6);
+}
+
+.economy-plus .seat[data-available="true"] {
+    background: linear-gradient(to bottom, #9b59b6, #8e44ad);
+}
+
+.economy-plus .seat[data-selected="true"] {
+    background: linear-gradient(to bottom, #e74c3c, #c0392b);
+    transform: scale(1.05);
+}
+
+/* Economy Seats */
+.economy .seat {
+    background: linear-gradient(to bottom, #7f8c8d, #95a5a6);
+}
+
+.economy .seat[data-available="true"] {
+    background: linear-gradient(to bottom, #27ae60, #229954);
+}
+
+.economy .seat[data-selected="true"] {
+    background: linear-gradient(to bottom, #e74c3c, #c0392b);
+    transform: scale(1.05);
+}
+
+/* Seat States */
+.seat[data-available="false"] {
+    background: linear-gradient(to bottom, #bdc3c7, #95a5a6) !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.seat:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.seat[data-available="false"]:hover {
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Seat Label */
+.seat-label {
+    font-size: 11px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Heat Map Styles */
+.heat-map-seat .seat {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.popularity-score {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    font-size: 9px;
+    padding: 2px 4px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .seat {
+        width: 28px;
+        height: 32px;
+        font-size: 10px;
+    }
+    
+    .business .seat {
+        width: 40px;
+        height: 45px;
+    }
+}

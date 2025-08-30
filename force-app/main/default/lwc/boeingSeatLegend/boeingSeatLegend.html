@@ -1,0 +1,28 @@
+<template>
+    <div class="legend-container">
+        <div class="legend">
+            <h3 class="slds-text-heading_small">Legend</h3>
+            <template for:each={legendItems} for:item="item">
+                <div key={item.type} class="legend-item">
+                    <div class={item.cssClass}></div>
+                    <span>{item.label}</span>
+                </div>
+            </template>
+        </div>
+        
+        <!-- Heat Map Legend -->
+        <template if:true={showHeatMap}>
+            <div class="heat-map-legend">
+                <h3 class="slds-text-heading_small">Popularity Heat Map</h3>
+                <div class="heat-scale">
+                    <template for:each={heatMapItems} for:item="item">
+                        <div key={item.color} class="heat-item">
+                            <div class="heat-color" style={item.style}></div>
+                            <span>{item.label}</span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </template>
+    </div>
+</template>

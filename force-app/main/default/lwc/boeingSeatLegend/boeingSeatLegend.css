@@ -1,0 +1,72 @@
+/* Legend Container */
+.legend-container {
+    display: flex;
+    gap: 40px;
+    flex: 1;
+}
+
+/* Legend */
+.legend {
+    flex: 1;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 10px;
+}
+
+.seat-demo {
+    width: 24px;
+    height: 28px;
+    border-radius: 4px 4px 2px 2px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.seat-demo.available {
+    background: linear-gradient(to bottom, #27ae60, #229954);
+}
+
+.seat-demo.occupied {
+    background: linear-gradient(to bottom, #bdc3c7, #95a5a6);
+}
+
+.seat-demo.selected {
+    background: linear-gradient(to bottom, #e74c3c, #c0392b);
+}
+
+.seat-demo.business-demo {
+    background: linear-gradient(to bottom, #3498db, #2980b9);
+}
+
+.seat-demo.economy-plus-demo {
+    background: linear-gradient(to bottom, #9b59b6, #8e44ad);
+}
+
+.seat-demo.economy-demo {
+    background: linear-gradient(to bottom, #27ae60, #229954);
+}
+
+/* Heat Map Legend */
+.heat-map-legend {
+    flex: 1;
+}
+
+.heat-scale {
+    margin-top: 10px;
+}
+
+.heat-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 10px;
+}
+
+.heat-color {
+    width: 30px;
+    height: 20px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}

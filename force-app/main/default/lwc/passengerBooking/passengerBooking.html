@@ -1,0 +1,374 @@
+<template>
+    <lightning-modal-header label="Book Flight"></lightning-modal-header>
+    
+    <lightning-modal-body>
+        <!-- Progress Indicator -->
+        <lightning-progress-indicator current-step={currentStep} type="path" variant="base">
+            <lightning-progress-step label="Flight Selection" value="flight-selection"></lightning-progress-step>
+            <lightning-progress-step label="Passenger Details" value="passenger-details"></lightning-progress-step>
+            <lightning-progress-step label="Seat Selection" value="seat-selection"></lightning-progress-step>
+            <lightning-progress-step label="Confirmation" value="confirmation"></lightning-progress-step>
+        </lightning-progress-indicator>
+
+        <!-- Step 1: Flight Selection -->
+        <template if:true={isFlightSelectionStep}>
+            <div class="slds-p-around_medium">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label" for="flight-search">
+                        <abbr class="slds-required" title="required">*</abbr>Select Flight
+                    </label>
+                    <div class="slds-form-element__control">
+                        <div class="slds-combobox_container">
+                            <div class={computedComboboxClass} aria-expanded={showFlightDropdown} aria-haspopup="listbox" role="combobox">
+                                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                    <lightning-input
+                                        id="flight-search"
+                                        type="text"
+                                        variant="label-hidden"
+                                        placeholder="Search flights..."
+                                        value={flightSearchTerm}
+                                        onchange={handleFlightSearch}
+                                        onfocus={handleFlightInputFocus}
+                                        onblur={handleFlightInputBlur}>
+                                    </lightning-input>
+                                    <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">
+                                        <lightning-icon 
+                                            icon-name="utility:search" 
+                                            size="x-small"
+                                            alternative-text="Search">
+                                        </lightning-icon>
+                                    </span>
+                                </div>
+                                <template if:true={showFlightDropdown}>
+                                    <div class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid" role="listbox">
+                                        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                            <template for:each={filteredFlightOptions} for:item="flight">
+                                                <li key={flight.value} 
+                                                    role="presentation" 
+                                                    class="slds-listbox__item"
+                                                    data-id={flight.value}
+                                                    onmousedown={handleFlightSelect}>
+                                                    <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option">
+                                                        <span class="slds-media__body">
+                                                            <span class="slds-listbox__option-text slds-listbox__option-text_entity">{flight.label}</span>
+                                                            <span class="slds-listbox__option-meta slds-listbox__option-meta_plain">{flight.meta}</span>
+                                                        </span>
+                                                    </div>
+                                                </li>
+                                            </template>
+                                            <template if:true={noFlightsFound}>
+                                                <li role="presentation" class="slds-listbox__item">
+                                                    <div class="slds-align_absolute-center slds-p-vertical_small">
+                                                        No flights found
+                                                    </div>
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <template if:true={flightDetails.Id}>
+                    <div class="slds-box slds-m-top_medium">
+                        <h3 class="slds-text-heading_small slds-m-bottom_small">Flight Details</h3>
+                        <dl class="slds-list_horizontal slds-wrap">
+                            <dt class="slds-item_label slds-text-color_weak">Flight Name:</dt>
+                            <dd class="slds-item_detail">{flightDetails.Name}</dd>
+                            <dt class="slds-item_label slds-text-color_weak">From:</dt>
+                            <dd class="slds-item_detail">{flightDetails.From_Location__c}</dd>
+                            <dt class="slds-item_label slds-text-color_weak">To:</dt>
+                            <dd class="slds-item_detail">{flightDetails.To_Location__c}</dd>
+                            <dt class="slds-item_label slds-text-color_weak">Departure:</dt>
+                            <dd class="slds-item_detail">
+                                <lightning-formatted-date-time 
+                                    value={flightDetails.Depart__c}
+                                    year="numeric"
+                                    month="short"
+                                    day="2-digit"
+                                    hour="2-digit"
+                                    minute="2-digit">
+                                </lightning-formatted-date-time>
+                            </dd>
+                            <dt class="slds-item_label slds-text-color_weak">Capacity:</dt>
+                            <dd class="slds-item_detail">{flightDetails.Passengers_Capacity__c} passengers</dd>
+                        </dl>
+                    </div>
+
+                    <div class="slds-m-top_medium">
+                        <lightning-input
+                            type="number"
+                            label="Number of Passengers"
+                            value={passengerCount}
+                            min="1"
+                            max="10"
+                            onchange={handlePassengerCountChange}
+                            required>
+                        </lightning-input>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <!-- Step 2: Passenger Details -->
+        <template if:true={isPassengerDetailsStep}>
+            <div class="slds-p-around_medium">
+                <div class="slds-text-align_right slds-m-bottom_small">
+                    <span class="slds-badge">{passengers.length} of {passengerCount} passengers added</span>
+                </div>
+
+                <!-- Passenger Forms -->
+                <template for:each={passengers} for:item="passenger">
+                    <div key={passenger.id} class="slds-box slds-m-bottom_small">
+                        <div class="slds-grid slds-gutters slds-wrap">
+                            <div class="slds-col slds-size_1-of-1">
+                                <h4 class="slds-text-heading_small">Passenger {passenger.id}</h4>
+                            </div>
+                            
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                                <lightning-combobox
+                                    label="Salutation"
+                                    value={passenger.salutation}
+                                    options={salutationOptions}
+                                    data-id={passenger.id}
+                                    data-field="salutation"
+                                    onchange={handlePassengerFieldChange}>
+                                </lightning-combobox>
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                <lightning-input
+                                    label="First Name"
+                                    value={passenger.firstName}
+                                    data-id={passenger.id}
+                                    data-field="firstName"
+                                    onchange={handlePassengerFieldChange}
+                                    required>
+                                </lightning-input>
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                <lightning-input
+                                    label="Last Name"
+                                    value={passenger.lastName}
+                                    data-id={passenger.id}
+                                    data-field="lastName"
+                                    onchange={handlePassengerFieldChange}
+                                    required>
+                                </lightning-input>
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                <lightning-input
+                                    type="email"
+                                    label="Email"
+                                    value={passenger.email}
+                                    data-id={passenger.id}
+                                    data-field="email"
+                                    onchange={handlePassengerFieldChange}
+                                    required
+                                    message-when-bad-input="Please enter a valid email address">
+                                </lightning-input>
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                                <lightning-input
+                                    type="number"
+                                    label="Age"
+                                    value={passenger.age}
+                                    min="1"
+                                    max="120"
+                                    data-id={passenger.id}
+                                    data-field="age"
+                                    onchange={handlePassengerFieldChange}
+                                    required>
+                                </lightning-input>
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                                <lightning-combobox
+                                    label="Gender"
+                                    value={passenger.gender}
+                                    options={genderOptions}
+                                    data-id={passenger.id}
+                                    data-field="gender"
+                                    onchange={handlePassengerFieldChange}>
+                                </lightning-combobox>
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                <lightning-input
+                                    label="Passport Number"
+                                    value={passenger.passportNumber}
+                                    data-id={passenger.id}
+                                    data-field="passportNumber"
+                                    onchange={handlePassengerFieldChange}
+                                    required>
+                                </lightning-input>
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-1 slds-text-align_right">
+                                <lightning-button
+                                    label="Remove"
+                                    variant="destructive-text"
+                                    data-id={passenger.id}
+                                    onclick={handleRemovePassenger}>
+                                </lightning-button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Add Passenger Button -->
+                <template if:true={canAddMorePassengers}>
+                    <div class="slds-text-align_center slds-m-top_medium">
+                        <lightning-button
+                            label="Add Passenger"
+                            variant="brand"
+                            icon-name="utility:add"
+                            onclick={handleAddPassenger}>
+                        </lightning-button>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <!-- Step 3: Seat Selection -->
+        <template if:true={isSeatSelectionStep}>
+            <div class="slds-p-around_medium">
+                <div class="slds-text-align_center slds-m-bottom_medium">
+                    <span class="slds-badge slds-badge_inverse">
+                        Select {passengerCount} seat(s) - {selectedSeats.length} selected
+                    </span>
+                </div>
+                
+                <c-boeing-seating-layout
+                    flight-id={selectedFlightId}
+                    blocked-seats={blockedSeats}
+                    max-selection={passengerCount}
+                    onseatselection={handleSeatSelection}>
+                </c-boeing-seating-layout>
+            </div>
+        </template>
+
+        <!-- Step 4: Confirmation -->
+        <template if:true={isConfirmationStep}>
+            <template if:false={showSuccessMessage}>
+                <div class="slds-p-around_medium">
+                    <h3 class="slds-text-heading_medium slds-m-bottom_medium">Booking Summary</h3>
+                    
+                    <div class="slds-box slds-m-bottom_medium">
+                        <h4 class="slds-text-heading_small slds-m-bottom_small">Flight Information</h4>
+                        <dl class="slds-list_horizontal slds-wrap">
+                            <dt class="slds-item_label slds-text-color_weak">Flight:</dt>
+                            <dd class="slds-item_detail">{flightDetails.Name}</dd>
+                            <dt class="slds-item_label slds-text-color_weak">Route:</dt>
+                            <dd class="slds-item_detail">{flightDetails.From_Location__c} → {flightDetails.To_Location__c}</dd>
+                        </dl>
+                    </div>
+
+                    <div class="slds-box slds-m-bottom_medium">
+                        <h4 class="slds-text-heading_small slds-m-bottom_small">Passengers</h4>
+                        <template for:each={passengers} for:item="passenger">
+                            <div key={passenger.id} class="slds-m-bottom_x-small">
+                                {passenger.salutation} {passenger.firstName} {passenger.lastName} 
+                                (Age: {passenger.age}, Passport: {passenger.passportNumber})
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="slds-box slds-m-bottom_medium">
+                        <h4 class="slds-text-heading_small slds-m-bottom_small">Selected Seats</h4>
+                        <template for:each={selectedSeats} for:item="seat">
+                            <lightning-badge key={seat.id} label={seat.id} class="slds-m-right_x-small"></lightning-badge>
+                        </template>
+                    </div>
+
+                    <div class="slds-box slds-theme_shade">
+                        <h4 class="slds-text-heading_small">Total Price: 
+                            <lightning-formatted-number 
+                                value={totalPrice} 
+                                format-style="currency" 
+                                currency-code="USD">
+                            </lightning-formatted-number>
+                        </h4>
+                    </div>
+                </div>
+            </template>
+            
+            <template if:true={showSuccessMessage}>
+                <div class="success-message">
+                    <div class="success-icon">✈️</div>
+                    <h2 class="slds-text-heading_large slds-m-bottom_medium">Booking Confirmed!</h2>
+                    <p class="slds-text-body_regular slds-m-bottom_small">
+                        Your flight has been successfully booked.
+                    </p>
+                    <p class="slds-text-body_regular">
+                        Seats {selectedSeats} have been reserved for Flight {flightDetails.Name}
+                    </p>
+                    <p class="slds-text-body_small slds-m-top_medium slds-text-color_weak">
+                        This window will close automatically...
+                    </p>
+                </div>
+            </template>
+        </template>
+    </lightning-modal-body>
+
+    <lightning-modal-footer>
+        <lightning-button
+            label="Cancel"
+            onclick={handleClose}>
+        </lightning-button>
+        
+        <template if:false={isFlightSelectionStep}>
+            <lightning-button
+                label="Back"
+                variant="neutral"
+                onclick={handleBack}>
+            </lightning-button>
+        </template>
+
+        <template if:true={isFlightSelectionStep}>
+            <lightning-button
+                label="Next"
+                variant="brand"
+                onclick={handleNextToPassengerDetails}
+                disabled={isLoading}>
+            </lightning-button>
+        </template>
+
+        <template if:true={isPassengerDetailsStep}>
+            <lightning-button
+                label="Next"
+                variant="brand"
+                onclick={handleNextToSeatSelection}>
+            </lightning-button>
+        </template>
+
+        <template if:true={isSeatSelectionStep}>
+            <lightning-button
+                label="Next"
+                variant="brand"
+                onclick={handleNextToConfirmation}>
+            </lightning-button>
+        </template>
+
+        <template if:true={isConfirmationStep}>
+            <template if:false={bookingCompleted}>
+                <lightning-button
+                    label="Confirm Booking"
+                    variant="brand"
+                    onclick={handleConfirmBooking}
+                    disabled={isLoading}>
+                </lightning-button>
+            </template>
+        </template>
+    </lightning-modal-footer>
+
+    <!-- Loading Spinner -->
+    <template if:true={isLoading}>
+        <lightning-spinner alternative-text="Loading..." size="medium"></lightning-spinner>
+    </template>
+</template>

@@ -1,0 +1,40 @@
+<template>
+    <div class={rowClasses} data-emergency-exit={isEmergencyExit}>
+        <div class="row-number">{row.rowNumber}</div>
+        
+        <template if:true={isEmergencyExit}>
+            <div class="emergency-exit-label left">EXIT</div>
+        </template>
+        
+        <div class="seats-container">
+            <!-- Left side seats -->
+            <div class="seat-group left-seats">
+                <template for:each={row.leftSeats} for:item="seat">
+                    <c-boeing-seat 
+                        key={seat.id}
+                        seat={seat}
+                        show-heat-map={showHeatMap}>
+                    </c-boeing-seat>
+                </template>
+            </div>
+            
+            <!-- Aisle -->
+            <div class={aisleClass}></div>
+            
+            <!-- Right side seats -->
+            <div class="seat-group right-seats">
+                <template for:each={row.rightSeats} for:item="seat">
+                    <c-boeing-seat 
+                        key={seat.id}
+                        seat={seat}
+                        show-heat-map={showHeatMap}>
+                    </c-boeing-seat>
+                </template>
+            </div>
+        </div>
+        
+        <template if:true={isEmergencyExit}>
+            <div class="emergency-exit-label right">EXIT</div>
+        </template>
+    </div>
+</template>

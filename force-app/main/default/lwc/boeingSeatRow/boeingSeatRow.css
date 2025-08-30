@@ -1,0 +1,93 @@
+/* Seat Rows */
+.seat-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.row-number {
+    position: absolute;
+    left: 10px;
+    font-weight: bold;
+    color: #666;
+    font-size: 14px;
+    width: 30px;
+}
+
+/* Emergency Exit Rows */
+.seat-row[data-emergency-exit="true"] {
+    margin: 20px 0;
+}
+
+.emergency-exit-label {
+    position: absolute;
+    background: #e74c3c;
+    color: white;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: bold;
+    border-radius: 3px;
+}
+
+.emergency-exit-label.left {
+    left: 50px;
+}
+
+.emergency-exit-label.right {
+    right: 50px;
+}
+
+/* Seats Container */
+.seats-container {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.seat-group {
+    display: flex;
+    gap: 4px;
+}
+
+/* Business Class Specific */
+.business-seats .seat-group {
+    gap: 8px;
+}
+
+/* Aisle */
+.aisle {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(to bottom, #e8e8e8, #f0f0f0);
+    margin: 0 10px;
+    position: relative;
+}
+
+.business-aisle {
+    width: 60px;
+}
+
+.aisle::before,
+.aisle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    height: 2px;
+    background: #d0d0d0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .aisle {
+        width: 30px;
+        margin: 0 5px;
+    }
+    
+    .business-aisle {
+        width: 40px;
+    }
+}

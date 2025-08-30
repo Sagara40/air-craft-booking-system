@@ -1,0 +1,17 @@
+<template>
+    <div class={containerClasses}
+         onclick={handleClick}
+         onmouseenter={handleMouseEnter}
+         onmouseleave={handleMouseLeave}>
+        <div class="seat" 
+             data-available={seat.isAvailable}
+             data-selected={seat.isSelected}
+             data-position={seat.position}
+             style={seatStyle}>
+            <span class="seat-label">{seat.letter}</span>
+            <template if:true={showHeatMap}>
+                <span class="popularity-score">{seat.popularityScore}</span>
+            </template>
+        </div>
+    </div>
+</template>

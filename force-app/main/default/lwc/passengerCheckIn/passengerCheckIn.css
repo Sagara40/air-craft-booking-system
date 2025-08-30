@@ -1,0 +1,94 @@
+.scanner-section {
+    padding: 2rem 0;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.manual-search-section {
+    padding: 1rem 0;
+}
+
+.passenger-item {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.passenger-item:hover {
+    background-color: #f3f2f2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.selected-passenger {
+    background-color: #e8f4fd;
+    border: 2px solid #0176d3;
+    border-radius: 4px;
+    padding: 0.5rem;
+    margin: -0.5rem;
+}
+
+.result-section {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.passenger-details {
+    background-color: #f9f9f9;
+}
+
+.slds-illustration {
+    padding: 2rem 0;
+}
+
+.search-results {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    .scanner-section {
+        padding: 1rem 0;
+    }
+    
+    lightning-card {
+        box-shadow: none;
+    }
+    
+    .slds-p-horizontal_medium {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+}
+
+/* Status badge styling */
+.slds-theme_success {
+    background-color: #04844b;
+    color: white;
+}
+
+/* Loading spinner container */
+.slds-is-relative {
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

@@ -1,0 +1,16 @@
+/* Selection Info */
+.selection-info,
+.hover-info {
+    flex: 1;
+    padding: 0 20px;
+}
+
+.selection-info p,
+.hover-info p {
+    margin: 5px 0;
+}
+
+.emergency-note {
+    color: #e74c3c;
+    font-weight: bold;
+}

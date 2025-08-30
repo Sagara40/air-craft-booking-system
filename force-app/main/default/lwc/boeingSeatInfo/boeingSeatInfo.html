@@ -1,0 +1,24 @@
+<template>
+    <!-- Selected Seats Info -->
+    <template if:true={hasSelectedSeats}>
+        <div class="selection-info">
+            <h3 class="slds-text-heading_small">Selected Seats</h3>
+            <p><strong>Seats:</strong> {selectedSeatsInfo}</p>
+            <p><strong>Total Price:</strong> ${totalPrice}</p>
+        </div>
+    </template>
+    
+    <!-- Hovered Seat Info -->
+    <template if:true={hasHoveredSeat}>
+        <div class="hover-info">
+            <h3 class="slds-text-heading_small">Seat Information</h3>
+            <p><strong>Seat:</strong> {hoveredSeat.id}</p>
+            <p><strong>Class:</strong> {hoveredSeatClass}</p>
+            <p><strong>Position:</strong> {hoveredSeatPosition}</p>
+            <p><strong>Price:</strong> ${hoveredSeat.price}</p>
+            <template if:true={hoveredSeat.isEmergencyExit}>
+                <p class="emergency-note">Emergency Exit Row</p>
+            </template>
+        </div>
+    </template>
+</template>

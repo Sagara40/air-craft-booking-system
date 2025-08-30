@@ -1,0 +1,270 @@
+<template>
+    <lightning-card title="Passenger Check-In" icon-name="custom:custom70">
+        <div class="slds-p-horizontal_medium">
+            
+            <!-- QR Scanner Section -->
+            <template if:true={scannerAvailable}>
+                <div class="qr-scanner-container">
+                    <!-- Static help text -->
+                    <div class="slds-text-color_weak slds-m-vertical_medium">
+                        <p>Tap <strong>Start QR Scanner</strong> to open a barcode scanner camera view.</p>
+                        <p>Position the passenger's QR code in the scanner view to check them in.</p>
+                    </div>
+                    
+                    <!-- Scan button -->
+                    <div class="slds-text-align_center slds-m-vertical_large">
+                        <lightning-button 
+                            label="Start QR Scanner" 
+                            variant="brand" 
+                            onclick={handleBeginScanClick}
+                            icon-name="utility:scan"
+                            disabled={isProcessing}>
+                        </lightning-button>
+                    </div>
+                    
+                    <!-- Manual Search Option -->
+                    <div class="slds-text-align_center slds-m-top_small">
+                        <lightning-button
+                            label="Manual Search"
+                            variant="neutral"
+                            icon-name="utility:search"
+                            onclick={handleToggleManualSearch}>
+                        </lightning-button>
+                    </div>
+                </div>
+            </template>
+
+            <!-- No Scanner Available Message -->
+            <template if:false={scannerAvailable}>
+                <div class="slds-scoped-notification slds-media slds-media_center slds-theme_warning slds-m-bottom_medium">
+                    <div class="slds-media__figure">
+                        <lightning-icon 
+                            icon-name="utility:warning" 
+                            size="small"
+                            variant="warning">
+                        </lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <p>QR scanner is not available on this device. Please use manual search.</p>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Manual Search Section -->
+            <template if:true={showManualSearch}>
+                <div class="manual-search-section slds-m-vertical_medium">
+                    <h3 class="slds-text-heading_small slds-m-bottom_medium">Manual Passenger Search</h3>
+                    
+                    <lightning-input
+                        type="search"
+                        label="Search Passengers"
+                        placeholder="Enter name, email, or phone..."
+                        value={searchTerm}
+                        onchange={handleSearchInputChange}>
+                    </lightning-input>
+
+                    <!-- Search Results -->
+                    <template if:true={hasSearchResults}>
+                        <div class="search-results slds-m-top_medium">
+                            <p class="slds-text-body_small slds-m-bottom_small">
+                                Found {searchResults.length} passenger(s)
+                            </p>
+                            <div class="slds-scrollable_y" style="max-height: 300px;">
+                                <template for:each={processedSearchResults} for:item="passenger">
+                                    <div key={passenger.Id} 
+                                         class="passenger-item slds-box slds-box_x-small slds-m-bottom_x-small"
+                                         data-passenger-id={passenger.Id}
+                                         onclick={handlePassengerSelect}>
+                                        <div class={passenger.selectedClass}>
+                                            <div class="slds-grid slds-grid_align-spread">
+                                                <div>
+                                                    <p class="slds-text-heading_small">
+                                                        {passenger.First_Name__c} {passenger.Last_Name__c}
+                                                    </p>
+                                                    <p class="slds-text-body_small slds-text-color_weak">
+                                                        Flight: {passenger.Flight__r.Name} | Seat: {passenger.Seat_Number__c}
+                                                    </p>
+                                                    <template if:true={passenger.Email__c}>
+                                                        <p class="slds-text-body_small">{passenger.Email__c}</p>
+                                                    </template>
+                                                </div>
+                                                <div class="slds-text-align_right">
+                                                    <template if:true={passenger.Check_In_Status__c}>
+                                                        <lightning-badge 
+                                                            label={passenger.Check_In_Status__c}
+                                                            class={passenger.statusClass}>
+                                                        </lightning-badge>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                            
+                            <div class="slds-m-top_medium slds-text-align_center">
+                                <lightning-button
+                                    label="Check In Selected Passenger"
+                                    variant="brand"
+                                    onclick={handleManualCheckIn}
+                                    disabled={selectedPassengerId}>
+                                </lightning-button>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- No Results Message -->
+                    <template if:true={noSearchResults}>
+                        <div class="slds-text-align_center slds-m-top_medium">
+                            <p class="slds-text-color_weak">No passengers found matching "{searchTerm}"</p>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <!-- Scanned Barcode Display -->
+            <template if:true={scannedBarcodeValue}>
+                <div class="slds-box slds-m-vertical_medium">
+                    <p class="slds-text-body_small slds-text-color_weak">Scanned QR Code:</p>
+                    <p class="slds-text-body_regular"><strong>{scannedBarcodeValue}</strong></p>
+                </div>
+            </template>
+
+            <!-- Loading Spinner -->
+            <template if:true={isProcessing}>
+                <div class="slds-is-relative slds-m-vertical_large">
+                    <lightning-spinner 
+                        alternative-text="Processing..." 
+                        size="medium">
+                    </lightning-spinner>
+                </div>
+            </template>
+
+            <!-- Result Display -->
+            <template if:true={hasResult}>
+                <div class="result-section slds-m-top_large">
+                    
+                    <!-- Success Result -->
+                    <template if:true={isSuccess}>
+                        <div class="slds-illustration slds-illustration_small">
+                            <div class="slds-text-align_center">
+                                <lightning-icon 
+                                    icon-name="action:approval" 
+                                    size="large"
+                                    variant="success"
+                                    class="slds-m-bottom_small">
+                                </lightning-icon>
+                                <h3 class="slds-text-heading_medium slds-text-color_success">
+                                    Check-In Successful!
+                                </h3>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Already Checked In -->
+                    <template if:true={isAlreadyCheckedIn}>
+                        <div class="slds-illustration slds-illustration_small">
+                            <div class="slds-text-align_center">
+                                <lightning-icon 
+                                    icon-name="action:priority" 
+                                    size="large"
+                                    variant="warning"
+                                    class="slds-m-bottom_small">
+                                </lightning-icon>
+                                <h3 class="slds-text-heading_medium slds-text-color_warning">
+                                    Already Checked In
+                                </h3>
+                                <p class="slds-text-body_regular slds-m-top_small">
+                                    This passenger has already been checked in.
+                                </p>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Not Found -->
+                    <template if:true={isNotFound}>
+                        <div class="slds-illustration slds-illustration_small">
+                            <div class="slds-text-align_center">
+                                <lightning-icon 
+                                    icon-name="utility:error" 
+                                    size="large"
+                                    variant="error"
+                                    class="slds-m-bottom_small">
+                                </lightning-icon>
+                                <h3 class="slds-text-heading_medium slds-text-color_error">
+                                    Passenger Not Found
+                                </h3>
+                                <p class="slds-text-body_regular slds-m-top_small">
+                                    {passengerResult.message}
+                                </p>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Passenger Details -->
+                    <template if:true={passengerDetails}>
+                        <div class="passenger-details slds-box slds-m-top_medium">
+                            <h3 class="slds-text-heading_small slds-m-bottom_small">Passenger Details</h3>
+                            <dl class="slds-list_horizontal slds-wrap">
+                                <dt class="slds-item_label slds-text-color_weak">Name:</dt>
+                                <dd class="slds-item_detail">
+                                    {passengerDetails.First_Name__c} {passengerDetails.Last_Name__c}
+                                </dd>
+                                
+                                <template if:true={passengerDetails.Email__c}>
+                                    <dt class="slds-item_label slds-text-color_weak">Email:</dt>
+                                    <dd class="slds-item_detail">{passengerDetails.Email__c}</dd>
+                                </template>
+                                
+                                <template if:true={passengerDetails.Flight__r.Name}>
+                                    <dt class="slds-item_label slds-text-color_weak">Flight:</dt>
+                                    <dd class="slds-item_detail">{passengerDetails.Flight__r.Name}</dd>
+                                </template>
+                                
+                                <template if:true={passengerDetails.Seat_Number__c}>
+                                    <dt class="slds-item_label slds-text-color_weak">Seat:</dt>
+                                    <dd class="slds-item_detail">{passengerDetails.Seat_Number__c}</dd>
+                                </template>
+                                
+                                <dt class="slds-item_label slds-text-color_weak">Check-In Status:</dt>
+                                <dd class="slds-item_detail">
+                                    <lightning-badge 
+                                        label={passengerDetails.Check_In_Status__c}
+                                        class={isSuccess}>
+                                    </lightning-badge>
+                                </dd>
+                                
+                                <dt class="slds-item_label slds-text-color_weak">Check-In Time:</dt>
+                                <dd class="slds-item_detail">
+                                    <template if:true={passengerDetails.Check_In_Time__c}>
+                                        <lightning-formatted-date-time 
+                                            value={passengerDetails.Check_In_Time__c}
+                                            year="numeric"
+                                            month="short"
+                                            day="2-digit"
+                                            hour="2-digit"
+                                            minute="2-digit">
+                                        </lightning-formatted-date-time>
+                                    </template>
+                                    <template if:false={passengerDetails.Check_In_Time__c}>
+                                        <span class="slds-text-color_weak">Not checked in</span>
+                                    </template>
+                                </dd>
+                            </dl>
+                        </div>
+                    </template>
+
+                    <!-- Action Button -->
+                    <div class="slds-text-align_center slds-m-top_large">
+                        <lightning-button
+                            label="Scan Another"
+                            variant="brand"
+                            onclick={handleReset}>
+                        </lightning-button>
+                    </div>
+                </div>
+            </template>
+
+        </div>
+    </lightning-card>
+</template>

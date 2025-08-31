@@ -1,3 +1,4 @@
+/*BookingEmailService*/
 public with sharing class BookingEmailService {
     
     public static void sendBookingConfirmationEmail(String recipientEmail, String lastName, DateTime createdDate, String bookingId) {
